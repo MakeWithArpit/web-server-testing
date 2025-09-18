@@ -1,6 +1,6 @@
-from flask import Flask, request, jsonify
-
+from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
+
 latest_data = {}
 
 @app.route('/data', methods=['POST'])
@@ -11,10 +11,7 @@ def receive_data():
 
 @app.route('/')
 def index():
-    display = "<h1>Latest ESP32 Data</h1>"
-    for k,v in latest_data.items():
-        display += f"<p>{k}: {v}</p>"
-    return display
+    return render_template('dashboard.html', data=latest_data)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=10000)
+    app.run(host='0.0.0.0', port=10000)
