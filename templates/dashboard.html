@@ -2,47 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="5" /> <!-- Auto refresh every 5 seconds -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ESP32 Sensor Dashboard</title>
+  <title>Sensor Data Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    body {
-      background: #f8f9fa;
-    }
-    .table-container {
-      margin-top: 50px;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
+    body { background-color: #f2f6fa; }
+    .container { margin-top: 40px; }
+    h1 { color: #007bff; margin-bottom: 30px; }
+    .alerts li { margin-bottom: 8px; }
+    .table thead { background-color: #007bff; color: #fff; }
   </style>
+  <meta http-equiv="refresh" content="5" />
 </head>
 <body>
-  <div class="container table-container">
-    <h1 class="text-center mb-4">Live ESP32 Sensor Data</h1>
+  <div class="container">
+    <h1 class="text-center">ESP8266 Sensor Data Dashboard</h1>
+
     {% if data %}
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered table-hover align-middle">
-        <thead class="table-primary">
-          <tr>
-            <th>Parameter</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for key, value in data.items() %}
-          <tr>
-            <td>{{ key|replace('_', ' ')|capitalize }}</td>
-            <td>{{ value }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+      <h4>Sensor Parameters</h4>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for key, value in data.items() %}
+              {% if not key.endswith('_alert') and key != 'overload_status' %}
+                <tr>
+                  <td>{{ key.replace('_', ' ').capitalize() }}</td>
+                  <td>{{ value }}</td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Alerts & Status</h4>
+      <ul class="list-group alerts">
+        {% if data.battery_alert %}
+          <li class="list-group-item list-group-item-warning">Battery Alert: {{ data.battery_alert }}</li>
+        {% endif %}
+        {% if data.solar_alert %}
+          <li class="list-group-item list-group-item-warning">Solar Alert: {{ data.solar_alert }}</li>
+        {% endif %}
+        {% if data.sunlight_alert %}
+          <li class="list-group-item list-group-item-danger">Sunlight Alert: {{ data.sunlight_alert }}</li>
+        {% endif %}
+        {% if data.charging_alert %}
+          <li class="list-group-item list-group-item-danger">Charging Alert: {{ data.charging_alert }}</li>
+        {% endif %}
+        {% if data.overload_status %}
+          <li class="list-group-item list-group-item-info">Load Status: {{ data.overload_status }}</li>
+        {% endif %}
+      </ul>
     {% else %}
-    <p class="text-center text-muted">No data received yet.</p>
+      <p class="text-center text-muted">No sensor data available yet.</p>
     {% endif %}
   </div>
 </body>
